@@ -154,4 +154,4 @@ The general solution is:
 
 ---
 
-*Part of [Benjamin Goodwin's portfolio](https://yourusername.github.io) — a growing collection of projects in applied maths, algorithms, and systems.*
+*Part of [Benjamin Goodwin's portfolio](https://beangoody.github.io) — a growing collection of projects in applied maths, algorithms, and systems.*
