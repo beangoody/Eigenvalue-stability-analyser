@@ -1,10 +1,17 @@
-# Eigenvalue & Phase Portrait Classifier
+# Eigenvalue & Phase Portrait Analyser
 
-A Python tool for analysing 2×2 linear ODE systems. Enter any matrix **A** for the system **x' = Ax**, and the tool will:
+A terminal application for analysing 2×2 linear ODE systems of the form **x' = Ax**. Enter your system as natural equations, raw matrix entries, or eigenvalues from a problem sheet — the tool computes the full eigenanalysis, classifies the fixed point, writes the general solution, and renders the phase portrait.
 
-- Compute **eigenvalues** and **eigenvectors** using NumPy's linear algebra routines
-- **Classify the fixed point** at the origin using the trace-determinant plane
-- **Plot the phase portrait** with a quiver direction field, coloured streamlines, and eigenvector overlays
+---
+
+## Features
+
+- **Natural equation input** — type `dx/dt = -x + y` exactly as it appears in a textbook
+- **Eigenvalue / eigenvector input** — accepts complex forms like `1 + sqrt(2)*i` or `-1 - √2i`
+- **Matrix entry mode** — fill in the four entries of A individually
+- **Preset exercises** — 8 textbook exercises pre-loaded, selectable from an arrow-key menu
+- **General solution** — written out symbolically after each analysis
+- **Phase portrait** — RK4-integrated streamlines, direction field, eigenvector overlays, stability-coded colours
 
 ---
 
@@ -30,33 +37,62 @@ cd eigen-phase-portrait
 pip install -r requirements.txt
 ```
 
+**Requirements:** Python 3.10+, NumPy, Matplotlib. No other dependencies.
+
 ---
 
 ## Usage
 
-### Interactive mode
+### Interactive mode (recommended)
 ```bash
 python main.py
 ```
-Prompts you to enter a 2×2 matrix row by row.
 
-### Command-line mode
-```bash
-# Stable spiral: eigenvalues -1 ± 2i
-python main.py --matrix -1 2 -2 -1
+Navigate with ↑↓ arrow keys and Enter. You will be prompted to choose an input method:
 
-# Saddle point
-python main.py --matrix 1 0 0 -1
-
-# Save the figure without opening a window
-python main.py --matrix -2 1 0 -3 --save output.png --no-show
+```
+  Choose input method
+  › Enter system equations          dx/dt = f(x,y)  ·  dy/dt = g(x,y)
+    Enter eigenvalues/eigenvectors  λ = a ± bi,  v = (v₁, v₂)
+    Enter matrix entries            Fill in matrix A directly
+    Load preset exercise            Textbook exercises pre-loaded
+    Quit
 ```
 
-### Run all built-in examples
+#### Equation input
+Type each equation as a linear expression in `x` and `y`:
+```
+dx/dt  =  -x + y
+dy/dt  =  x - 3*y
+```
+Accepted forms: `-x + y`, `2*x - y`, `3*y`, `-2*x`, `x - 3*y`
+
+#### Eigenvalue input
+Useful when working from a problem sheet where eigenvalues are already given:
+```
+λ₁  =  1 + sqrt(2)*i
+v₁  =  (0.9, 0.4)
+```
+For complex conjugate pairs, `λ₂` and `v₂` are filled in automatically.
+
+Accepted eigenvalue formats:
+| Input | Interpreted as |
+|---|---|
+| `2` | 2 |
+| `-1.5` | −1.5 |
+| `1+2i` | 1 + 2i |
+| `-1-sqrt(2)*i` | −1 − √2 i |
+| `1+√2i` | 1 + √2 i |
+| `3i` | 3i |
+
+#### Preset exercises
+Pre-loaded exercises from a dynamics course, selectable by name. Includes stable/unstable nodes, spirals, a saddle, and a centre.
+
+### Non-interactive mode
 ```bash
 python main.py --examples
 ```
-Cycles through a stable node, unstable node, saddle, stable spiral, unstable spiral, and centre — useful for a quick sanity check.
+Prints the full eigenanalysis report for all preset exercises to stdout — useful for piping or quick reference.
 
 ---
 
@@ -64,7 +100,9 @@ Cycles through a stable node, unstable node, saddle, stable spiral, unstable spi
 
 ```
 eigen-phase-portrait/
-├── main.py               # CLI entry point
+├── main.py               # Application entry point & interactive UI loop
+├── ui.py                 # Terminal UI helpers (arrow-key menus, colours, prompts)
+├── equation_parser.py    # Parses equations, eigenvalues, and eigenvectors from strings
 ├── eigen_classifier.py   # Eigenvalue computation & fixed point classification
 ├── phase_portrait.py     # Phase portrait rendering (matplotlib)
 ├── requirements.txt
@@ -75,40 +113,43 @@ eigen-phase-portrait/
 
 ## Mathematical Background
 
-For the system **x' = Ax**, the long-term behaviour near the origin is determined by the eigenvalues of **A**.
+For the system **x' = Ax**, behaviour near the origin is determined entirely by the eigenvalues of **A**, computed from the characteristic equation λ² − tr(A)·λ + det(A) = 0:
 
-The classification depends on the **trace** τ = tr(A) and **determinant** Δ = det(A):
+```
+λ = ( tr(A) ± √(tr(A)² − 4·det(A)) ) / 2
+```
 
-- **Δ < 0** → saddle (eigenvalues real, opposite signs)
-- **Δ > 0, τ² − 4Δ > 0** → node (real distinct eigenvalues)
-- **Δ > 0, τ² − 4Δ < 0** → spiral or centre (complex eigenvalues)
-- **Stability** is determined by the sign of τ (the sum of the real parts of the eigenvalues)
+When the discriminant is negative, eigenvalues are complex conjugates `a ± bi`, giving spiral or centre behaviour. Classification uses the trace-determinant plane:
+
+- **det(A) < 0** → saddle
+- **det(A) > 0, disc > 0** → node (stability from sign of tr)
+- **det(A) > 0, disc < 0** → spiral or centre (stability from sign of tr)
+- **tr(A) = 0, disc < 0** → centre
+
+The general solution is:
+
+- **Real distinct eigenvalues:** `z(t) = C₁·e^(λ₁t)·v₁ + C₂·e^(λ₂t)·v₂`
+- **Complex eigenvalues λ = a ± bi:** `z(t) = e^(at)·[C₁·cos(bt) + C₂·sin(bt)]`
 
 ---
 
-## Example Output
+## Example Session
 
 ```
-====================================================
- EIGENVALUE PHASE PORTRAIT ANALYSIS
-====================================================
-  Matrix A:
-    [  -1.000    2.000 ]
-    [  -2.000   -1.000 ]
+  Jacobian A:
+    ┌  -1.0000   1.0000 ┐
+    └   1.0000  -3.0000 ┘
 
-  Trace       : -2.0000
-  Determinant : 5.0000
-  Discriminant: -16.0000
+  trace(A) = -4.0000     det(A) = 2.0000     disc = 8.0000
 
-  λ₁ = -1.0000 + 2.0000i    eigenvector: [+0.7071,  +0.0000]
-  λ₂ = -1.0000 - 2.0000i    eigenvector: [+0.7071,  +0.0000]
+  λ₁  =  -0.5858        eigenvector:  (+0.9239,  +0.3827)ᵀ
+  λ₂  =  -3.4142        eigenvector:  (-0.3827,  +0.9239)ᵀ
 
-  ┌─ Classification: Stable Spiral
-  └─ Stability     : Stable
+  General solution:
+    z(t)  =  C₁·e^(-0.5858t)·(+0.9239, +0.3827)ᵀ
+           +  C₂·e^(-3.4142t)·(-0.3827, +0.9239)ᵀ
 
-  The eigenvalues are complex with negative real part. Trajectories
-  spiral inward toward the origin — asymptotically stable.
-====================================================
+  ┌─ Stable Node  ·  STABLE ─┐
 ```
 
 ---
