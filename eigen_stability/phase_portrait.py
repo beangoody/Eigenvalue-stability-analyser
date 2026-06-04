@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 from matplotlib.lines import Line2D
-from eigen_stability.eigen_classifier import EigenResult
+from eigen_classifier import EigenResult
 
 
 # ─── Colour palette ──────────────────────────────────────────────────────────

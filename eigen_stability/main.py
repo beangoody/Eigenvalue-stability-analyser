@@ -22,8 +22,8 @@ import argparse
 import sys
 import numpy as np
 
-from eigen_stability.eigen_classifier import analyse, format_report
-from eigen_stability.phase_portrait import plot_phase_portrait
+from eigen_classifier import analyse, format_report
+from phase_portrait import plot_phase_portrait
 
 
 # ─── Built-in example matrices ───────────────────────────────────────────────
