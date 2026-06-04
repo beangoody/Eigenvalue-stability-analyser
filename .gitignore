@@ -1,15 +1,30 @@
-venv/
-.venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-env/
-build/
-dist/
-.pytest_cache/
-.mypy_cache/
 *.egg-info/
-.vscode/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
 venv/
-*.log
+env/
+
+# Output files
+*.png
+*.jpg
+*.pdf
+*.svg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
