@@ -112,30 +112,26 @@ def menu(prompt, options, descriptions=None):
     print(c(f"\n  {prompt}", "bold", "white"))
     print()
 
-    def render():
-        # Move cursor up to redraw
-        sys.stdout.write(f"\033[{n + 1}A")
-        sys.stdout.flush()
-        print()
-        for i, opt in enumerate(options):
-            prefix = c("  › ", "bblue", "bold") if i == idx else "    "
-            label  = c(opt, "bold", "white") if i == idx else c(opt, "white")
-            desc   = ""
-            if descriptions and i < len(descriptions):
-                d = descriptions[i]
-                desc = "  " + (c(d, "bblue") if i == idx else c(d, "dim"))
-            print(f"{prefix}{label}{desc}")
-
-    # Initial draw
-    print()
-    for i, opt in enumerate(options):
+    def format_line(i):
         prefix = c("  › ", "bblue", "bold") if i == idx else "    "
-        label  = c(opt, "bold", "white") if i == idx else c(opt, "white")
+        label  = c(options[i], "bold", "white") if i == idx else c(options[i], "white")
         desc   = ""
         if descriptions and i < len(descriptions):
             d = descriptions[i]
             desc = "  " + (c(d, "bblue") if i == idx else c(d, "dim"))
-        print(f"{prefix}{label}{desc}")
+        return f"{prefix}{label}{desc}"
+
+    def render():
+        clear()
+        print(c(f"\n  {prompt}", "bold", "white"))
+        print()
+        for i in range(n):
+            print(format_line(i))
+
+    # Initial draw
+    print()
+    for i in range(n):
+        print(format_line(i))
 
     while True:
         key = _getch()
